@@ -15,9 +15,9 @@
 
 ## Table of Contents
 
-  * [Quick start](https://github.com/iconation/Daedric#quick-start)
-  * [Deploy Ecclesia SCORE to localhost, testnet or mainnet](https://github.com/iconation/Daedric#deploy-daedric-score-to-localhost-testnet-or-mainnet)
-  * [Update an already deployed Daedric to localhost, testnet or mainnet](https://github.com/iconation/Daedric#update-an-already-deployed-daedric-to-localhost-testnet-or-mainnet)
+  * [Quick start](https://github.com/iconation/Ecclesia#quick-start)
+  * [Deploy Ecclesia SCORE to localhost, testnet or mainnet](https://github.com/iconation/Ecclesia#deploy-daedric-score-to-localhost-testnet-or-mainnet)
+  * [Update an already deployed Ecclesia to localhost, testnet or mainnet](https://github.com/iconation/Ecclesia#update-an-already-deployed-daedric-to-localhost-testnet-or-mainnet)
 
 ## Quick Start
 
@@ -63,7 +63,7 @@ Here is a checklist you will need to follow in order to deploy Ecclesia to the Y
 
 ## Update an already deployed Ecclesia to localhost, testnet or mainnet
 
-- If you modified the Daedric SCORE source code, you may need to update it.
+- If you modified the Ecclesia SCORE source code, you may need to update it.
 
 - In the root folder of the project, run the following command:
 <pre>$ ./scripts/score/update_score.sh</pre>

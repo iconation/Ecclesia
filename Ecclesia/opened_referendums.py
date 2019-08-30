@@ -46,12 +46,6 @@ class OpenedReferendums(object):
     _OPENED_REFERENDUMS = 'OPENED_REFERENDUMS'
 
     # ================================================
-    #  Initialization
-    # ================================================
-    def __init__(self) -> None:
-        pass
-
-    # ================================================
     #  Private Methods
     # ================================================
     @staticmethod
