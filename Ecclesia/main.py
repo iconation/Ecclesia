@@ -17,7 +17,7 @@
 from iconservice import *
 from .utils import *
 from .checks import *
-from .opened_referendums import *
+from .referendum_composite import *
 from .version import *
 
 TAG = 'Ecclesia'
@@ -26,6 +26,13 @@ ECCLESIA_VERSION = '0.0.1'
 
 class Ecclesia(IconScoreBase):
     """ Ecclesia SCORE Base implementation """
+
+    # ================================================
+    #  Event Logs
+    # ================================================
+    @eventlog(indexed=1)
+    def ReferendumCreatedEvent(self, uid: int) -> None:
+        pass
 
     # ================================================
     #  Initialization
@@ -39,7 +46,6 @@ class Ecclesia(IconScoreBase):
 
     def on_update(self) -> None:
         super().on_update()
-        Logger.warning(dir(self))
         Version.set(self.db, ECCLESIA_VERSION)
 
     # ================================================
@@ -47,48 +53,41 @@ class Ecclesia(IconScoreBase):
     # ================================================
     @only_owner
     @external
+    @catch_error
     def create_referendum(self,
                           end: int,
                           quorum: int,
                           question: str,
                           answers: str,
                           voters: str) -> None:
-        try:
-            # Create a newly opened referendum
-            OpenedReferendums.insert(
-                self.db,
-                end,
-                quorum,
-                question,
-                json_loads(answers),
-                json_loads(voters)
-            )
-        except Exception as e:
-            Logger.error(repr(e), TAG)
-            revert(repr(e))
+        # Create a newly opened referendum
+        uid = ReferendumComposite.create(
+            self.db,
+            end,
+            quorum,
+            question,
+            json_loads(answers),
+            json_loads(voters))
+        self.ReferendumCreatedEvent(uid)
 
     @external
-    def vote(self, uid: int, answer: int) -> None:
-        try:
-            OpenedReferendums.vote(self.db, self.msg.sender, uid, answer)
-        except Exception as e:
-            Logger.error(repr(e), TAG)
-            revert(repr(e))
+    @catch_error
+    def vote(self,
+             referendum_id: int,
+             answer: int,
+             weight: int) -> None:
+        referendum = Referendum(self.db, referendum_id)
+        voter = Voter(self.db, referendum_id, self.msg.sender)
+        referendum.vote(self.db, voter, answer, weight, self.now())
 
     @only_owner
     @external
+    @catch_error
     def clear_referendums(self) -> None:
-        try:
-            OpenedReferendums.delete(self.db)
-        except Exception as e:
-            Logger.error(repr(e), TAG)
-            revert(repr(e))
+        ReferendumComposite.delete(self.db)
 
     @external(readonly=True)
-    def opened_referendums(self) -> list:
-        """ Return a list of opened referendums """
-        return OpenedReferendums.serialize(self.db)
-
-    # ================================================
-    #  Private methods
-    # ================================================
+    @catch_error
+    def referendums(self) -> list:
+        """ Return a list of all referendums """
+        return ReferendumComposite.serialize(self.db)

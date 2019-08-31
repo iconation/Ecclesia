@@ -42,6 +42,16 @@ class BallotFactory(object):
         uid.set(uid.get() + 1)
         return uid.get()
 
+    @staticmethod
+    def create(db: IconScoreDatabase, referendum: int, address: Address, answer: int, vote: int) -> int:
+        uid = BallotFactory.get_uid(db)
+        ballot = Ballot(db, uid)
+        ballot._address.set(address)
+        ballot._referendum.set(referendum)
+        ballot._answer.set(answer)
+        ballot._vote.set(vote)
+        return uid
+
 
 class Ballot(object):
     # ================================================
@@ -49,46 +59,31 @@ class Ballot(object):
     # ================================================
     _ADDRESS = 'BALLOT_ADDRESS'
     _REFERENDUM = 'BALLOT_REFERENDUM'
-    _ANSWER = 'BALLOT_VOTE'
+    _ANSWER = 'BALLOT_ANSWER'
     _VOTE = 'BALLOT_VOTE'
 
     # ================================================
-    #  Private Methods
+    #  Initialization
     # ================================================
-    @staticmethod
-    def _address(db: IconScoreDatabase, uid: int) -> VarDB:
-        return VarDB(f'{Ballot._ADDRESS}_{uid}', db, value_type=Address)
-
-    @staticmethod
-    def _referendum(db: IconScoreDatabase, uid: int) -> VarDB:
-        return VarDB(f'{Ballot._REFERENDUM}_{uid}', db, value_type=int)
-
-    @staticmethod
-    def _answer(db: IconScoreDatabase, uid: int) -> VarDB:
-        return VarDB(f'{Ballot._ANSWER}_{uid}', db, value_type=int)
-
-    @staticmethod
-    def _vote(db: IconScoreDatabase, uid: int) -> VarDB:
-        return VarDB(f'{Ballot._VOTE}_{uid}', db, value_type=int)
+    def __init__(self, db: IconScoreDatabase, uid: int) -> None:
+        self._address = VarDB(f'{Ballot._ADDRESS}_{uid}', db, value_type=Address)
+        self._referendum = VarDB(f'{Ballot._REFERENDUM}_{uid}', db, value_type=int)
+        self._answer = VarDB(f'{Ballot._ANSWER}_{uid}', db, value_type=int)
+        self._vote = VarDB(f'{Ballot._VOTE}_{uid}', db, value_type=int)
 
     # ================================================
     #  Public Methods
     # ================================================
-    @staticmethod
-    def delete(db: IconScoreDatabase, uid: int) -> None:
-        Ballot._weight(db, uid).remove()
+    def delete(self) -> None:
+        self._address.remove()
+        self._referendum.remove()
+        self._answer.remove()
+        self._weight.remove()
 
-    @staticmethod
-    def insert(db: IconScoreDatabase, address: Address, referendum: int, answer: int, vote: int) -> int:
-        uid = BallotFactory.get_uid(db)
-        Ballot._address(db, uid).set(address)
-        Ballot._referendum(db, uid).set(referendum)
-        Ballot._answer(db, uid).set(answer)
-        Ballot._vote(db, uid).set(vote)
-        return uid
-
-    @staticmethod
-    def serialize(db: IconScoreDatabase, address: Address, uid: int, answer: int) -> dict:
+    def serialize(self) -> dict:
         return {
-            'vote': Ballot._vote(db, address, uid, answer).get()
+            'address': self._address.get(),
+            'referendum': self._referendum.get(),
+            'answer': self._answer.get(),
+            'vote': self._vote.get()
         }

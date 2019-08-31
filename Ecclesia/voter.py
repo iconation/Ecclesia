@@ -21,8 +21,20 @@ from .ballot import *
 TAG = 'Ecclesia'
 
 
-class VoterNotEnoughWeight(Exception):
+class VoterNotEnoughWeightError(Exception):
     pass
+
+
+class VoterFactory(object):
+    @staticmethod
+    def create(db: IconScoreDatabase,
+               referendum: int,
+               address: Address,
+               weight: int) -> None:
+
+        voter = Voter(db, referendum, address)
+        # Logger.warning(f'Voter {address} has weight {weight}')
+        voter._weight.set(weight)
 
 
 class Voter(object):
@@ -30,46 +42,48 @@ class Voter(object):
     #  DB Variables
     # ================================================
     _WEIGHT = 'VOTER_WEIGHT'
+    _BALLOTS = 'VOTER_BALLOTS'
+
+    # ================================================
+    #  Initialization
+    # ================================================
+    def __init__(self, db: IconScoreDatabase, referendum: int, address: Address) -> None:
+        self._referendum = referendum
+        self._address = address
+        self._weight = VarDB(f'{Voter._WEIGHT}_{referendum}_{address}', db, value_type=int)
+        self._ballots = ArrayDB(f'{Voter._BALLOTS}_{referendum}_{address}', db, value_type=int)
 
     # ================================================
     #  Checks
     # ================================================
-    def _check_enough_weight(db: IconScoreDatabase, address: Address, uid: int, target_weight: int) -> None:
-        current_weight = Voter.weight(db, address, uid)
-        if target_weight > current_weight:
-            raise VoterNotEnoughWeight
-
-    # ================================================
-    #  Private Methods
-    # ================================================
-    @staticmethod
-    def _weight(db: IconScoreDatabase, address: Address, uid: int) -> VarDB:
-        return VarDB(f'{Voter._WEIGHT}_{address}_{uid}', db, value_type=int)
+    def _check_enough_weight(self, target_weight: int) -> None:
+        if target_weight > self._weight.get():
+            raise VoterNotEnoughWeightError(f'{self._address} : {target_weight} > {self._weight.get()}')
 
     # ================================================
     #  Public Methods
     # ================================================
-    @staticmethod
-    def insert(db: IconScoreDatabase, address: Address, uid: int, weight: int) -> None:
-        Voter._weight(db, address, uid).set(weight)
+    def delete(self) -> None:
+        self._weight.remove()
+        Utils.array_db_clear(self._ballots)
 
-    @staticmethod
-    def delete(db: IconScoreDatabase, address: Address, uid: int) -> None:
-        Voter._weight(db, address, uid).remove()
-
-    @staticmethod
-    def vote(db: IconScoreDatabase, address: Address, uid: int, answer: int, weight: int) -> None:
-        Voter._check_enough_weight(weight)
+    def vote(self,
+             db: IconScoreDatabase,
+             answer: int,
+             weight: int) -> int:
+        self._check_enough_weight(weight)
 
         # Set the voting weight to the ballot
-        Ballot.insert(db, address, uid, answer, weight)
+        ballot = BallotFactory.create(db, self._referendum, self._address, answer, weight)
+        self._ballots.put(ballot)
 
         # Update the voting weight of the voter
-        current_weight = Voter._weight(db, address, uid)
-        current_weight.set(current_weight.get() - weight)
+        self._weight.set(self._weight.get() - weight)
 
-    @staticmethod
-    def serialize(db: IconScoreDatabase, address: Address, uid: int) -> dict:
+        return ballot
+
+    def serialize(self) -> dict:
         return {
-            'weight': Voter._weight(db, address, uid).get()
+            'weight': self._weight.get(),
+            'ballots': list(map(lambda ballot: ballot, self._ballots))
         }

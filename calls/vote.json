@@ -10,8 +10,9 @@
         "data": {
             "method": "vote",
             "params": {
-                "uid": "xxx",
-                "answer": "xxx"
+                "referendum_id": "xxx",
+                "answer": "xxx",
+                "weight": "xxx"
             }
         }
     },

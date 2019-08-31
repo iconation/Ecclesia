@@ -17,29 +17,32 @@
 from iconservice import *
 
 
+TAG = 'Ecclesia'
+
+
 # ================================================
 #  Exceptions
 # ================================================
-class SenderNotScoreOwner(Exception):
+class SenderNotScoreOwnerError(Exception):
     pass
 
 
-class SenderNotWalletOwner(Exception):
+class SenderNotWalletOwnerError(Exception):
     pass
 
 
-class NotAFunction(Exception):
+class NotAFunctionError(Exception):
     pass
 
 
 def only_wallet(func):
     if not isfunction(func):
-        raise NotAFunction
+        raise NotAFunctionError
 
     @wraps(func)
     def __wrapper(self: object, *args, **kwargs):
         if self.msg.sender != self.address:
-            raise SenderNotWalletOwner
+            raise SenderNotWalletOwnerError
 
         return func(self, *args, **kwargs)
     return __wrapper
@@ -47,12 +50,27 @@ def only_wallet(func):
 
 def only_owner(func):
     if not isfunction(func):
-        raise NotAFunction
+        raise NotAFunctionError
 
     @wraps(func)
     def __wrapper(self: object, *args, **kwargs):
         if self.msg.sender != self.owner:
-            raise SenderNotScoreOwner
+            raise SenderNotScoreOwnerError
 
         return func(self, *args, **kwargs)
+    return __wrapper
+
+
+def catch_error(func):
+    if not isfunction(func):
+        raise NotAFunctionError
+
+    @wraps(func)
+    def __wrapper(self: object, *args, **kwargs):
+        try:
+            func(self, *args, **kwargs)
+        except Exception as e:
+            Logger.error(repr(e), TAG)
+            revert(repr(e))
+
     return __wrapper
