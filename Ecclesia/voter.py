@@ -25,6 +25,10 @@ class VoterNotEnoughWeightError(Exception):
     pass
 
 
+class VoterWeightValueError(Exception):
+    pass
+
+
 class VoterFactory(object):
     @staticmethod
     def create(db: IconScoreDatabase,
@@ -56,7 +60,9 @@ class Voter(object):
     # ================================================
     #  Checks
     # ================================================
-    def _check_enough_weight(self, target_weight: int) -> None:
+    def _check_weight(self, target_weight: int) -> None:
+        if target_weight <= 0:
+            raise VoterWeightValueError(f'{self._address} : {target_weight} <= 0')
         if target_weight > self._weight.get():
             raise VoterNotEnoughWeightError(f'{self._address} : {target_weight} > {self._weight.get()}')
 
@@ -71,7 +77,7 @@ class Voter(object):
              db: IconScoreDatabase,
              answer: int,
              weight: int) -> int:
-        self._check_enough_weight(weight)
+        self._check_weight(weight)
 
         # Set the voting weight to the ballot
         ballot = BallotFactory.create(db, self._referendum, self._address, answer, weight)

@@ -160,3 +160,20 @@ class TestEcclesia(IconIntegrateTestBase):
             icon_service=self.icon_service
         )
         self.assertTrue('VoterNotEnoughWeightError' in result['failure']['message'])
+
+    def test_vote_invalid_refereum(self):
+        referendum_id = self.create_referendum()
+        # OK
+        result = transaction_call_error(
+            super(),
+            from_=self._wallet_array[0],
+            to_=self._score_address,
+            method="vote",
+            params={
+                'referendum_id': referendum_id,
+                'answer': 0,
+                'weight': 0
+            },
+            icon_service=self.icon_service
+        )
+        self.assertTrue('VoterWeightValueError' in result['failure']['message'])
