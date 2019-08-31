@@ -13,7 +13,8 @@
                 "end": "xxx",
                 "quorum": "xxx",
                 "question": "xxx",
-                "answers": "xxx"
+                "answers": "xxx",
+                "voters": "xxx"
             }
         }
     },

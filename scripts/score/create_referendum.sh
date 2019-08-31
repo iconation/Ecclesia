@@ -9,12 +9,13 @@ function print_usage {
     usage_option " -l <quorum> : Quorum (percentage between 0-100)"
     usage_option " -q <question> : Question of the referendum"
     usage_option " -a <answers> : JSON formatted array with all answers"
+    usage_option " -v <voters> : JSON formatted array with all voters"
     usage_footer
     exit 1
 }
 
 function process {
-    if [[ ("$network" == "") || ("$end" == "") || ("$quorum" == "") || ("$question" == "") || ("$answers" == "") ]]; then
+    if [[ ("$network" == "") || ("$end" == "") || ("$quorum" == "") || ("$question" == "") || ("$answers" == "") || ("$voters" == "") ]]; then
         print_usage
     fi
 
@@ -26,6 +27,7 @@ function process {
             ${quorum@Q}
             ${question@Q}
             ${answers@Q}
+            ${voters@Q}
         )
         -c ./config/${network}/tbears_cli_config.json
 COMMAND
@@ -36,7 +38,7 @@ COMMAND
 }
 
 # Parameters
-while getopts "n:e:l:q:a:" option; do
+while getopts "n:e:l:q:a:v:" option; do
     case "${option}" in
         n)
             network=${OPTARG}
@@ -52,6 +54,9 @@ while getopts "n:e:l:q:a:" option; do
             ;;
         a)
             answers=${OPTARG}
+            ;;
+        v)
+            voters=${OPTARG}
             ;;
         *)
             print_usage 

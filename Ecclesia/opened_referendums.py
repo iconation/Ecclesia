@@ -77,15 +77,15 @@ class OpenedReferendums(object):
 
     @staticmethod
     def insert(db: IconScoreDatabase,
-               uid: int,
                end: int,
                quorum: int,
                question: str,
-               answers: list) -> Referendum:
+               answers: list,
+               voters: list) -> Referendum:
         OpenedReferendums._check_answers_count(answers)
 
+        uid = Referendum.insert(db, end, quorum, question, answers)
         OpenedReferendums._opened_referendums(db).put(uid)
-        Referendum.insert(db, uid, end, quorum, question, answers)
 
     @staticmethod
     def vote(db: IconScoreDatabase, voter: Address, uid: int, answer: int) -> None:

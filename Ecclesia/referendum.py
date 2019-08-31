@@ -20,15 +20,38 @@ from .utils import *
 TAG = 'Ecclesia'
 
 
+class ReferendumFactory(object):
+    # ================================================
+    #  DB Variables
+    # ================================================
+    _UID = 'REFERENDUM_FACTORY_UID'
+
+    # ================================================
+    #  Private Methods
+    # ================================================
+    @staticmethod
+    def _uid(db: IconScoreDatabase) -> VarDB:
+        return VarDB(f'{ReferendumFactory._UID}', db, value_type=int)
+
+    # ================================================
+    #  Public Methods
+    # ================================================
+    @staticmethod
+    def get_uid(db: IconScoreDatabase) -> int:
+        uid = ReferendumFactory._uid(db)
+        uid.set(uid.get() + 1)
+        return uid.get()
+
+
 class Referendum(object):
     # ================================================
     #  DB Variables
     # ================================================
-    _QUESTION = 'QUESTION'
-    _ANSWERS = 'ANSWERS'
-    _VOTES = 'VOTES'
-    _END = 'END'
-    _QUORUM = 'QUORUM'
+    _QUESTION = 'REFERENDUM_QUESTION'
+    _ANSWERS = 'REFERENDUM_ANSWERS'
+    _VOTES = 'REFERENDUM_VOTES'
+    _END = 'REFERENDUM_END'
+    _QUORUM = 'REFERENDUM_QUORUM'
 
     # ================================================
     #  Private Methods
@@ -58,17 +81,18 @@ class Referendum(object):
     # ================================================
     @staticmethod
     def insert(db: IconScoreDatabase,
-               uid: int,
                end: int,
                quorum: int,
                question: str,
-               answers: list) -> None:
+               answers: list) -> int:
+        uid = ReferendumFactory.get_uid(db)
         Referendum._end(db, uid).set(end)
         Referendum._quorum(db, uid).set(quorum)
         Referendum._question(db, uid).set(question)
         for answer in answers:
             Referendum._answers(db, uid).put(answer)
             Referendum._votes(db, uid).put(0)
+        return uid
 
     @staticmethod
     def delete(db: IconScoreDatabase, uid: int) -> None:

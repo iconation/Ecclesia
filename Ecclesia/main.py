@@ -28,21 +28,13 @@ class Ecclesia(IconScoreBase):
     """ Ecclesia SCORE Base implementation """
 
     # ================================================
-    #  DB Variables
-    # ================================================
-    # Referendum Unique ID
-    _REFERENDUM_LAST_UID = 'REFERENDUM_LAST_UID'
-
-    # ================================================
     #  Initialization
     # ================================================
     def __init__(self, db: IconScoreDatabase) -> None:
         super().__init__(db)
-        self._referendum_last_uid = VarDB(self._REFERENDUM_LAST_UID, db, value_type=int)
 
     def on_install(self) -> None:
         super().on_install()
-        self._referendum_last_uid.set(0)
         Version.set(self.db, ECCLESIA_VERSION)
 
     def on_update(self) -> None:
@@ -59,14 +51,18 @@ class Ecclesia(IconScoreBase):
                           end: int,
                           quorum: int,
                           question: str,
-                          answers: str) -> None:
+                          answers: str,
+                          voters: str) -> None:
         try:
-            # Create a new opened referendum
-            uid = self._referendum_last_uid.get()
-            OpenedReferendums.insert(self.db, uid, end, quorum, question, json_loads(answers))
-
-            # Update the UID
-            self._referendum_last_uid.set(uid + 1)
+            # Create a newly opened referendum
+            OpenedReferendums.insert(
+                self.db,
+                end,
+                quorum,
+                question,
+                json_loads(answers),
+                json_loads(voters)
+            )
         except Exception as e:
             Logger.error(repr(e), TAG)
             revert(repr(e))
@@ -84,16 +80,9 @@ class Ecclesia(IconScoreBase):
     def clear_referendums(self) -> None:
         try:
             OpenedReferendums.delete(self.db)
-            self._referendum_last_uid.set(0)
         except Exception as e:
             Logger.error(repr(e), TAG)
             revert(repr(e))
-
-    # ==== ReadOnly methods =============================================
-    @external(readonly=True)
-    def uid(self) -> int:
-        """ Return the current UID generator """
-        return self._referendum_last_uid.get()
 
     @external(readonly=True)
     def opened_referendums(self) -> list:
