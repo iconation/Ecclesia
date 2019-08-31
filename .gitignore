@@ -2,7 +2,8 @@
 .statedb
 exc
 tbears.log
-
+__pycache__/
+*.py[cod]
 venv
 
 config/euljiro/keystores

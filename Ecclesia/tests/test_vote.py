@@ -85,7 +85,7 @@ class TestEcclesia(IconIntegrateTestBase):
                 'end': 2567281501517606,
                 'quorum': 100,
                 'question': 'Yes or No ?',
-                'answers': '["Yes", "No"]',
+                'answers': '["Yes", "No", "Maybe"]',
                 'voters': '[ \
                     {"address" : "' + self._wallet_array[0].get_address() + '", "weight": 100},   \
                     {"address" : "' + self._wallet_array[1].get_address() + '", "weight": 100},    \
@@ -126,3 +126,37 @@ class TestEcclesia(IconIntegrateTestBase):
             },
             icon_service=self.icon_service
         )
+
+    def test_vote_invalid_answer(self):
+        referendum_id = self.create_referendum()
+        # OK
+        result = transaction_call_error(
+            super(),
+            from_=self._wallet_array[0],
+            to_=self._score_address,
+            method="vote",
+            params={
+                'referendum_id': referendum_id,
+                'answer': 10000,
+                'weight': 100
+            },
+            icon_service=self.icon_service
+        )
+        self.assertTrue('ArrayDB out of index' in result['failure']['message'])
+
+    def test_vote_invalid_weight(self):
+        referendum_id = self.create_referendum()
+        # OK
+        result = transaction_call_error(
+            super(),
+            from_=self._wallet_array[0],
+            to_=self._score_address,
+            method="vote",
+            params={
+                'referendum_id': referendum_id,
+                'answer': 0,
+                'weight': 100000
+            },
+            icon_service=self.icon_service
+        )
+        self.assertTrue('VoterNotEnoughWeightError' in result['failure']['message'])

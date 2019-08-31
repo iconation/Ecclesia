@@ -91,3 +91,21 @@ class Ecclesia(IconScoreBase):
     def referendums(self) -> list:
         """ Return a list of all referendums """
         return ReferendumComposite.serialize(self.db)
+
+    @external(readonly=True)
+    @catch_error
+    def referendum(self, referendum_id: int) -> dict:
+        """ Return a list of all referendums """
+        return Referendum(self.db, referendum_id).serialize()
+
+    @external(readonly=True)
+    @catch_error
+    def voter(self, referendum_id: int, address: Address) -> dict:
+        """ Return a list of all referendums """
+        return Voter(self.db, referendum_id, address).serialize()
+
+    @external(readonly=True)
+    @catch_error
+    def ballot(self, ballot_id: int) -> dict:
+        """ Return a list of all referendums """
+        return Ballot(self.db, ballot_id).serialize()

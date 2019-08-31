@@ -68,7 +68,7 @@ def catch_error(func):
     @wraps(func)
     def __wrapper(self: object, *args, **kwargs):
         try:
-            func(self, *args, **kwargs)
+            return func(self, *args, **kwargs)
         except Exception as e:
             Logger.error(repr(e), TAG)
             revert(repr(e))
