@@ -15,11 +15,11 @@
 
 ## Table of Contents
 
-  * [Quick start](https://github.com/iconation/Ecclesia#quick-start)
+  * [Developers Quick start](https://github.com/iconation/Ecclesia#quick-start)
   * [Deploy Ecclesia SCORE to localhost, testnet or mainnet](https://github.com/iconation/Ecclesia#deploy-daedric-score-to-localhost-testnet-or-mainnet)
   * [Update an already deployed Ecclesia to localhost, testnet or mainnet](https://github.com/iconation/Ecclesia#update-an-already-deployed-daedric-to-localhost-testnet-or-mainnet)
 
-## Quick Start
+## Developers Quick Start
 
 Here is a checklist you will need to follow in order to deploy Ecclesia to the Yeouido testnet:
 
