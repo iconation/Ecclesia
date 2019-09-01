@@ -149,7 +149,7 @@ class Referendum(object):
         self._ballots.put(ballot)
 
         # Update the referendum results
-        self._votes[answer] += 1
+        self._votes[answer] += weight
 
     def serialize(self) -> dict:
         return {
