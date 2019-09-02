@@ -27,15 +27,15 @@ class ReferendumComposite(object):
     # ================================================
     #  DB Variables
     # ================================================
-    # Array of referendums uid
-    _UID = 'REFERENDUM_COMPOSITE_UID'
+    # Referendums are indexed by their UID
+    _INDEX = 'REFERENDUM_COMPOSITE_INDEX'
 
     # ================================================
     #  Private Methods
     # ================================================
     @staticmethod
     def _referendums(db: IconScoreDatabase) -> ArrayDB:
-        return ArrayDB(ReferendumComposite._UID, db, value_type=int)
+        return ArrayDB(ReferendumComposite._INDEX, db, value_type=int)
 
     # ================================================
     #  Public Methods
@@ -60,15 +60,15 @@ class ReferendumComposite(object):
         return uid
 
     @staticmethod
-    def delete(db: IconScoreDatabase) -> None:
-        referendums = ReferendumComposite._referendums(db)
-        while referendums:
-            uid = referendums.pop()
-            Referendum(db, uid).delete()
-
-    @staticmethod
     def serialize(db: IconScoreDatabase) -> list:
         return list(map(lambda uid: {
             'uid': uid,
             'referendum': Referendum(db, uid).serialize()
         }, ReferendumComposite._referendums(db)))
+
+    @staticmethod
+    def delete(db: IconScoreDatabase) -> None:
+        referendums = ReferendumComposite._referendums(db)
+        while referendums:
+            uid = referendums.pop()
+            Referendum(db, uid).delete()

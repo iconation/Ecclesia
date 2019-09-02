@@ -125,17 +125,6 @@ class Referendum(object):
     # ================================================
     #  Public Methods
     # ================================================
-    def delete(self) -> None:
-        self._end.remove()
-        self._quorum.remove()
-        self._question.remove()
-        Utils.array_db_clear(self._answers)
-        Utils.array_db_clear(self._votes)
-        Utils.array_db_clear(self._ballots)
-
-    # ================================================
-    #  Public Methods
-    # ================================================
     def vote(self,
              db: IconScoreDatabase,
              voter: Voter,
@@ -160,3 +149,11 @@ class Referendum(object):
             'votes': list(map(lambda vote: vote, self._votes)),
             'ballots': list(map(lambda ballot: ballot, self._ballots))
         }
+
+    def delete(self) -> None:
+        self._end.remove()
+        self._quorum.remove()
+        self._question.remove()
+        Utils.array_db_clear(self._answers)
+        Utils.array_db_clear(self._votes)
+        Utils.array_db_clear(self._ballots)

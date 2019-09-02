@@ -21,7 +21,7 @@ from .referendum_composite import *
 from .version import *
 
 TAG = 'Ecclesia'
-ECCLESIA_VERSION = '0.0.1'
+VERSION = '0.0.1'
 
 
 class Ecclesia(IconScoreBase):
@@ -42,11 +42,11 @@ class Ecclesia(IconScoreBase):
 
     def on_install(self) -> None:
         super().on_install()
-        Version.set(self.db, ECCLESIA_VERSION)
+        Version.set(self.db, VERSION)
 
     def on_update(self) -> None:
         super().on_update()
-        Version.set(self.db, ECCLESIA_VERSION)
+        Version.set(self.db, VERSION)
 
     # ================================================
     #  External methods

@@ -74,12 +74,6 @@ class Ballot(object):
     # ================================================
     #  Public Methods
     # ================================================
-    def delete(self) -> None:
-        self._address.remove()
-        self._referendum.remove()
-        self._answer.remove()
-        self._weight.remove()
-
     def serialize(self) -> dict:
         return {
             'address': self._address.get(),
@@ -87,3 +81,9 @@ class Ballot(object):
             'answer': self._answer.get(),
             'vote': self._vote.get()
         }
+
+    def delete(self) -> None:
+        self._address.remove()
+        self._referendum.remove()
+        self._answer.remove()
+        self._weight.remove()

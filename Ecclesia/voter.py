@@ -69,10 +69,6 @@ class Voter(object):
     # ================================================
     #  Public Methods
     # ================================================
-    def delete(self) -> None:
-        self._weight.remove()
-        Utils.array_db_clear(self._ballots)
-
     def vote(self,
              db: IconScoreDatabase,
              answer: int,
@@ -93,3 +89,7 @@ class Voter(object):
             'weight': self._weight.get(),
             'ballots': list(map(lambda ballot: ballot, self._ballots))
         }
+
+    def delete(self) -> None:
+        self._weight.remove()
+        Utils.array_db_clear(self._ballots)

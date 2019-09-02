@@ -21,7 +21,6 @@ class Version(object):
     # ================================================
     #  DB Variables
     # ================================================
-    # Ecclesia Version
     _VERSION = 'VERSION'
 
     # ================================================
@@ -44,6 +43,10 @@ class Version(object):
     @staticmethod
     def set(db: IconScoreDatabase, version: str) -> None:
         Version._version(db).set(version)
+
+    @staticmethod
+    def get(db: IconScoreDatabase) -> str:
+        return Version._version(db).get()
 
     @staticmethod
     def is_less_than_target_version(last: str, target: str) -> bool:
